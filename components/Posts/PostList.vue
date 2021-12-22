@@ -19,6 +19,7 @@ export default {
   components: {
     PostPreview,
   },
+  name: 'PostList',
   props: {
     isAdmin: {
       type: Boolean,

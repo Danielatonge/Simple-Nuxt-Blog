@@ -13,11 +13,15 @@ export default {
   layout: 'admin',
   methods: {
     async onSubmitted(formData) {
-      const response = await axios.post(
-        'https://nuxt-blog-9fbb2-default-rtdb.firebaseio.com/posts.json',
-        formData
-      )
-      console.log(response)
+      try {
+        const response = await axios.post(
+          'https://nuxt-blog-9fbb2-default-rtdb.firebaseio.com/posts.json',
+          formData
+        )
+        console.log(response)
+      } catch (e) {
+        console.error(e)
+      }
     },
   },
 }
