@@ -22,18 +22,13 @@ export default {
   },
   methods: {
     async onSubmitted(updatePost) {
-      try {
-        const postId = this.$route.params.postId
-        const response = await axios.put(
-          `https://nuxt-blog-9fbb2-default-rtdb.firebaseio.com/posts/${postId}.json`,
-          updatePost
-        )
-        this.$store
-          .dispatch('updatePost', response.data)
-          .then(() => this.$router.push({ path: '/admin/' }))
-      } catch (e) {
-        console.error(e)
+      const payload = {
+        postId: this.$route.params.postId,
+        post: updatePost,
       }
+      await this.$store
+        .dispatch('updatePost', payload)
+        .then(() => this.$router.push({ path: '/admin/' }))
     },
   },
 }

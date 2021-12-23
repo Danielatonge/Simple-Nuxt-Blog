@@ -1,9 +1,14 @@
 <template>
-  <div>Post page</div>
+  <div class="posts-page">
+    <PostList :posts="posts" />
+  </div>
 </template>
 
 <script>
-export default {}
+import { mapState } from 'vuex'
+export default {
+  computed: { ...mapState(['posts']) },
+}
 </script>
 
 <style scoped>

@@ -7,22 +7,13 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 export default {
   layout: 'admin',
   methods: {
     async onSubmitted(formData) {
-      try {
-        const response = await axios.post(
-          'https://nuxt-blog-9fbb2-default-rtdb.firebaseio.com/posts.json',
-          { ...formData, updatedDate: new Date() }
-        )
-        console.log(response)
+      await this.$store.dispatch('addPost', formData).then(() => {
         this.$router.push({ path: '/admin' })
-      } catch (e) {
-        console.error(e)
-      }
+      })
     },
   },
 }

@@ -28,6 +28,7 @@ export default {
         result.push({ ...response.data[key], id: key })
       }
       store.dispatch('setPosts', result)
+      console.log(result)
     } catch (e) {
       error(e)
     }
