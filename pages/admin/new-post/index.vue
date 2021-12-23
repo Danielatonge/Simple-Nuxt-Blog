@@ -16,9 +16,10 @@ export default {
       try {
         const response = await axios.post(
           'https://nuxt-blog-9fbb2-default-rtdb.firebaseio.com/posts.json',
-          formData
+          { ...formData, updatedDate: new Date() }
         )
         console.log(response)
+        this.$router.push({ path: '/admin' })
       } catch (e) {
         console.error(e)
       }
