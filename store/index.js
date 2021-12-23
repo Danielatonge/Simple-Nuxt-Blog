@@ -2,7 +2,8 @@
 import axios from 'axios';
 
 export const state = () => ({
-    posts: []
+    posts: [],
+    token: "" || localStorage.getItem('jwtToken')
 })
 
 export const mutations = {
@@ -21,6 +22,10 @@ export const mutations = {
                 post = upDatePost;
             }
         }
+    },
+    SET_TOKEN(state, token) {
+        localStorage.setItem('jwtToken', token)
+        state.token = token;
     }
 }
 
@@ -65,6 +70,30 @@ export const actions = {
             )
             console.log(response.data.name)
             commit('ADD_POST', response.data.name)
+        } catch (e) {
+            console.error(e)
+        }
+    },
+    async logIn({ commit }, userInfo) {
+        const key = process.env.fbAPIKey
+        try {
+            const response = await axios.post(
+                `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${key}`,
+                userInfo
+            )
+            commit('SET_TOKEN', response.data.idToken)
+        } catch (e) {
+            console.error(e)
+        }
+    },
+    async registerUser({ commit }, userInfo) {
+        const key = process.env.fbAPIKey
+        try {
+            const response = await axios.post(
+                `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${key}`,
+                userInfo
+            )
+            commit('SET_TOKEN', response.data.idToken)
         } catch (e) {
             console.error(e)
         }
