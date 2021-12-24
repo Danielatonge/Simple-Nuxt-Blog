@@ -1,9 +1,10 @@
 
 import axios from 'axios';
+import Cookie from 'js-cookie'
 
 export const state = () => ({
     posts: [],
-    token: "" || localStorage.getItem('jwtToken')
+    token: ""
 })
 
 export const mutations = {
@@ -24,8 +25,10 @@ export const mutations = {
         }
     },
     SET_TOKEN(state, token) {
-        localStorage.setItem('jwtToken', token)
         state.token = token;
+    },
+    CLEAR_TOKEN(state) {
+        state.token = null;
     }
 }
 
@@ -44,10 +47,14 @@ export const actions = {
             serverContext.error(errorObject)
         }
     },
-    async updatePost({ commit }, { postId, post }) {
+    async updatePost({ commit, state }, { postId, post }) {
         try {
+            let token = state.token
+            if (token || process.client) {
+                token = localStorage.getItem('jwtToken')
+            }
             const response = await axios.put(
-                `https://nuxt-blog-9fbb2-default-rtdb.firebaseio.com/posts/${postId}.json`,
+                `https://nuxt-blog-9fbb2-default-rtdb.firebaseio.com/posts/${postId}.json?auth=${token}`,
                 post
             )
             console.log(response.data)
@@ -55,6 +62,7 @@ export const actions = {
 
         } catch (e) {
             console.error(e)
+
         }
 
     },
@@ -62,10 +70,14 @@ export const actions = {
         console.log(posts)
         commit('SET_POSTS', posts);
     },
-    async addPost({ commit }, post) {
+    async addPost({ commit, state }, post) {
+        let token = state.token
+        if (token || process.client) {
+            token = localStorage.getItem('jwtToken')
+        }
         try {
             const response = await axios.post(
-                'https://nuxt-blog-9fbb2-default-rtdb.firebaseio.com/posts.json',
+                `https://nuxt-blog-9fbb2-default-rtdb.firebaseio.com/posts.json?auth=${token}`,
                 { ...post, updatedDate: new Date() }
             )
             console.log(response.data.name)
@@ -74,14 +86,22 @@ export const actions = {
             console.error(e)
         }
     },
-    async logIn({ commit }, userInfo) {
+    async logIn({ commit, dispatch }, userInfo) {
         const key = process.env.fbAPIKey
         try {
             const response = await axios.post(
-                `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${key}`,
+                `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${key}`,
                 userInfo
             )
-            commit('SET_TOKEN', response.data.idToken)
+            const result = response.data
+            commit('SET_TOKEN', result.idToken)
+            localStorage.setItem('jwtToken', result.idToken)
+            localStorage.setItem('tokenTimeout', new Date().getTime() + (result.expiresIn * 1000))
+
+            Cookie.set('jwtToken', result.idToken)
+            Cookie.set('tokenTimeout', new Date().getTime() + (result.expiresIn * 1000))
+
+            dispatch('setLogoutTimer', result.expiresIn * 1000)
         } catch (e) {
             console.error(e)
         }
@@ -89,13 +109,51 @@ export const actions = {
     async registerUser({ commit }, userInfo) {
         const key = process.env.fbAPIKey
         try {
-            const response = await axios.post(
+            return await axios.post(
                 `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${key}`,
                 userInfo
             )
-            commit('SET_TOKEN', response.data.idToken)
         } catch (e) {
             console.error(e)
         }
+    },
+    setLogoutTimer({ commit }, duration) {
+        setTimeout(() => {
+            commit('CLEAR_TOKEN')
+        }, duration)
+    },
+    initAuth({ commit, dispatch }, req) {
+        let token, expireTime
+        if (req) {
+            if (!req.headers.cookie) {
+                return;
+            }
+            const jwtToken = req.headers.cookie.split(';')
+                .find(c => c.trim().startsWith('jwtToken'))
+            if (!jwtToken) {
+                return;
+            }
+            token = jwtToken.split('=')[1];
+            expireTime = req.headers.cookie.split(';')
+                .find(c => c.trim().startsWith('tokenTimeout')).split('=')[1]
+
+            dispatch('setLogoutTimer', expireTime - new Date().getTime())
+            commit('SET_TOKEN', token)
+        } else {
+            token = localStorage.getItem('jwtToken');
+            expireTime = new Date(localStorage.getItem('tokenTimeout'))
+
+            if (new Date().getTime() > expireTime || !token) {
+                return;
+            }
+        }
+        dispatch('setLogoutTimer', expireTime - new Date().getTime())
+        commit('SET_TOKEN', token)
+    }
+}
+
+export const getters = {
+    isAuthenticated(state) {
+        return state.token
     }
 }

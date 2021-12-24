@@ -10,6 +10,7 @@
 import axios from 'axios'
 export default {
   layout: 'admin',
+  middleware: ['check-auth', 'auth'],
   async asyncData({ error, params }) {
     try {
       const response = await axios.get(

@@ -7,7 +7,6 @@
 <script>
 import { mapState } from 'vuex'
 export default {
-  middleware: 'log',
   computed: { ...mapState(['posts']) },
 }
 </script>

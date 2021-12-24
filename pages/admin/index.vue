@@ -18,6 +18,7 @@ import axios from 'axios'
 
 export default {
   layout: 'admin',
+  middleware: ['check-auth', 'auth'],
   async fetch({ store, error }) {
     try {
       const response = await axios.get(

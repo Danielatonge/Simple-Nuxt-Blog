@@ -9,6 +9,7 @@
 <script>
 export default {
   layout: 'admin',
+  middleware: ['check-auth', 'auth'],
   methods: {
     async onSubmitted(formData) {
       await this.$store.dispatch('addPost', formData).then(() => {

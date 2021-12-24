@@ -38,10 +38,14 @@ export default {
         password: this.password,
         returnSecureToken: true,
       }
-      if (!this.isLogin) {
-        this.$store.dispatch('logIn', payload)
+      if (this.isLogin) {
+        this.$store.dispatch('logIn', payload).then((e) => {
+          this.$router.push('/admin')
+        })
       } else {
-        this.$store.dispatch('registerUser', payload)
+        this.$store.dispatch('registerUser', payload).then((e) => {
+          console.log('REGISTER', e)
+        })
       }
     },
   },
