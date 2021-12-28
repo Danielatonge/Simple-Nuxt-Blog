@@ -1,3 +1,6 @@
+import bodyParser from 'body-parser'
+import axios from 'axios'
+
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -18,9 +21,7 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [
-    '~plugins/core-components.js'
-  ],
+  plugins: ['~plugins/core-components.js'],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: {
@@ -30,7 +31,7 @@ export default {
       '~/components/Navigation',
       '~/components/Posts',
       '~/components/UI',
-    ]
+    ],
   },
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
@@ -52,7 +53,7 @@ export default {
   },
 
   env: {
-    fbAPIKey: 'AIzaSyB4Fhzeh6kkP96UUexgedIPcy_jiZQ2X5I'
+    fbAPIKey: 'AIzaSyB4Fhzeh6kkP96UUexgedIPcy_jiZQ2X5I',
   },
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {},
@@ -61,6 +62,6 @@ export default {
     color: 'blue',
     failedColor: 'red',
     height: '4px',
-    duration: 5000
-  }
+    duration: 5000,
+  },
 }
