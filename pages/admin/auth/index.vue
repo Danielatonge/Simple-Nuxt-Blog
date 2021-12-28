@@ -45,6 +45,7 @@ export default {
       } else {
         this.$store.dispatch('registerUser', payload).then((e) => {
           console.log('REGISTER', e)
+          this.$router.push('/admin')
         })
       }
     },
@@ -67,4 +68,3 @@ export default {
   box-sizing: border-box;
 }
 </style>
-
